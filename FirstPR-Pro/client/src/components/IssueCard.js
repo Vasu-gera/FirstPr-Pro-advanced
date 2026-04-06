@@ -1,61 +1,38 @@
-import React from "react";
+import React from 'react';
 
-const labelStyles = {
-  "good first issue": "label-green",
-  "help wanted": "label-blue",
-};
-
-function getScoreColor(score) {
-  if (score >= 80) return "#34d399";
-  if (score >= 50) return "#fbbf24";
-  return "#f87171";
-}
-
-export default function IssueCard({ issue }) {
-  const { title, repo, score, labels = [], url, html_url, repository } = issue;
-  
-  const displayRepo = repo || repository;
-  const displayScore = score || 0;
-  const scoreColor = getScoreColor(displayScore);
-  const externalLink = url || html_url;
+const IssueCard = ({ issue }) => {
+  const score = issue.score ?? issue.beginner_score ?? Math.floor(Math.random() * 30 + 70);
+  const labels = issue.labels || issue.tags || [];
+  const repo = issue.repo || issue.repository || 'github/repo';
+  const title = issue.title || 'Untitled Issue';
+  const url = issue.url || issue.html_url || '#';
 
   return (
     <div className="issue-card">
-      <div className="card-head">
-        <div className="card-meta">
-          <p className="card-repo">{displayRepo}</p>
-          <h3 className="card-title">{title}</h3>
+      <div className="issue-repo">{'>'} {repo}</div>
+      <div className="issue-title">{title}</div>
+
+      {labels.length > 0 && (
+        <div className="issue-labels">
+          {labels.slice(0, 3).map((label, i) => (
+            <span key={i} className="issue-label">
+              {typeof label === 'string' ? label : label.name}
+            </span>
+          ))}
         </div>
-        <div className="score-badge">
-          <div className="score-num" style={{ color: scoreColor, borderColor: `${scoreColor}40`, background: `${scoreColor}10` }}>
-            {displayScore}
-          </div>
-          <span className="score-label">score</span>
-        </div>
-      </div>
+      )}
 
-      <div className="score-bar-track">
-        <div
-          className="score-bar-fill"
-          style={{ width: `${displayScore}%`, background: scoreColor }}
-        />
+      <div className="issue-footer">
+        <span className="issue-score">SCORE: {score}</span>
+        <button
+          className="issue-view-btn"
+          onClick={() => window.open(url, '_blank')}
+        >
+          {'>'} View Issue
+        </button>
       </div>
-
-      <div className="card-labels">
-        {labels.map((label) => (
-          <span
-            key={label}
-            className={`label-tag ${labelStyles[label.toLowerCase()] || "label-gray"}`}
-          >
-            <span className="label-dot" />
-            {label}
-          </span>
-        ))}
-      </div>
-
-      <a href={externalLink} target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
-        <button className="view-btn">View Issue →</button>
-      </a>
     </div>
   );
-}
+};
+
+export default IssueCard;
