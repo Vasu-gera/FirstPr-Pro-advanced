@@ -59,7 +59,9 @@ def fetch_github_issues(skills: str):
                 "repo": repo_name,
                 "url": item.get("html_url"),
                 "comments": item.get("comments"),
-                "created_at": item.get("created_at")
+                "created_at": item.get("created_at"),
+                "body": item.get("body", ""),
+                "labels": item.get("labels", [])
             })
 
         return cleaned_issues
@@ -67,3 +69,4 @@ def fetch_github_issues(skills: str):
     except Exception as e:
         print("Error fetching GitHub issues:", e)
         return []
+

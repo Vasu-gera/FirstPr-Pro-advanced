@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from services import github
+from services.ranking import rank_issues
 
 router = APIRouter()
 
@@ -11,7 +12,8 @@ def get_issues(skills: str = ""):
     # Fetch real issues from GitHub
     issues = github.fetch_github_issues(skills)
 
-    # TODO: Apply ranking logic in utils/ranking.py later
-    # This is where we will score issues based on difficulty and relevance.
+    # Apply ranking logic to calculate match scores
+    if issues:
+        issues = rank_issues(issues, skills)
 
     return issues
