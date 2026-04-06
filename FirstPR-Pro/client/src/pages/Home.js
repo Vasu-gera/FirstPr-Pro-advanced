@@ -60,6 +60,26 @@ const STEPS = [
   { icon: '🚀', title: 'Ship Your PR',   desc: 'Open the issue, fork the repo, and make your first real open source commit.' },
 ];
 
+/* ─── Common Skills Data ─── */
+const SKILLS_DATA = [
+  "JavaScript", "TypeScript", "Python", "Java", "C++", "C#", "Go", "Rust", "Swift", "Kotlin", "Ruby",
+  "React", "Vue", "Angular", "Svelte", "Next.js", "Express", "FastAPI", "Django", "Flask", "Spring",
+  "Node.js", "Docker", "Kubernetes", "AWS", "Firebase", "PostgreSQL", "MongoDB", "Redis", "MySQL",
+  "HTML", "CSS", "TailwindCSS", "Sass", "Redux", "GraphQL", "TensorFlow", "PyTorch", "OpenCV",
+  "Scikit-learn", "Unity", "Unreal Engine", "Figma", "WebAssembly", "Bash", "Shell"
+];
+
+/* ─── Click Outside Hook ─── */
+const useClickOutside = (ref, callback) => {
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) callback();
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [ref, callback]);
+};
+
 /* ─── CJK safety filter (frontend fallback) ─── */
 const containsCJK = (text = '') => {
   for (let i = 0; i < text.length; i++) {
@@ -88,8 +108,16 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
   const [searched, setSearched] = useState(false);
+  
+  // Autocomplete state
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
+  
   const appRef = useRef(null);
-
+  const suggestionRef = useRef(null);
+  
+  useClickOutside(suggestionRef, () => setShowSuggestions(false));
   useReveal();
 
   const scrollToApp = () => {
@@ -97,16 +125,17 @@ const Home = () => {
     setTimeout(() => appRef.current?.querySelector('input')?.focus(), 500);
   };
 
-  const findIssues = async () => {
-    if (!skills.trim()) return;
+  const findIssues = async (overrideSkills) => {
+    const query = overrideSkills || skills;
+    if (!query.trim()) return;
     setLoading(true);
     setError(null);
     setSearched(true);
+    setShowSuggestions(false);
     try {
-      const res = await fetch(`http://localhost:8000/issues?skills=${encodeURIComponent(skills)}`);
+      const res = await fetch(`http://localhost:8000/issues?skills=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
-      // Frontend safety filter: drop any CJK issues that slipped past the backend
       const englishOnly = Array.isArray(data) ? data.filter(isEnglishIssue) : [];
       setIssues(englishOnly);
     } catch (err) {
@@ -117,7 +146,55 @@ const Home = () => {
     }
   };
 
-  const handleKey = (e) => { if (e.key === 'Enter') findIssues(); };
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setSkills(val);
+    
+    // Get the part being typed (last skill after comma)
+    const lastCommaIndex = val.lastIndexOf(',');
+    const currentPart = (lastCommaIndex === -1 ? val : val.substring(lastCommaIndex + 1)).trim().toLowerCase();
+    
+    if (currentPart.length >= 1) {
+      const matches = SKILLS_DATA.filter(s => s.toLowerCase().startsWith(currentPart) && !val.toLowerCase().includes(s.toLowerCase()));
+      setFilteredSuggestions(matches);
+      setShowSuggestions(matches.length > 0);
+      setSuggestionIndex(0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const selectSuggestion = (skill) => {
+    const lastCommaIndex = skills.lastIndexOf(',');
+    const base = lastCommaIndex === -1 ? '' : skills.substring(0, lastCommaIndex + 1).trim() + ' ';
+    const newVal = base + skill + ', ';
+    setSkills(newVal);
+    setShowSuggestions(false);
+    // Focus back on input
+    appRef.current?.querySelector('input')?.focus();
+  };
+
+  const handleKey = (e) => {
+    if (e.key === 'Enter') {
+      if (showSuggestions && filteredSuggestions[suggestionIndex]) {
+        selectSuggestion(filteredSuggestions[suggestionIndex]);
+      } else {
+        findIssues();
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (showSuggestions) {
+        e.preventDefault();
+        setSuggestionIndex(prev => (prev < filteredSuggestions.length - 1 ? prev + 1 : prev));
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (showSuggestions) {
+        e.preventDefault();
+        setSuggestionIndex(prev => (prev > 0 ? prev - 1 : prev));
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  };
 
   const SkeletonCard = () => (
     <div className="skeleton-card">
@@ -353,19 +430,36 @@ const Home = () => {
                 <div className="terminal-body">
                   <div className="search-input-row">
                     <span className="search-prefix">$</span>
-                    <input
-                      id="skill-input"
-                      type="text"
-                      className="cyber-input"
-                      placeholder="enter skills: python, react, rust, go..."
-                      value={skills}
-                      onChange={(e) => setSkills(e.target.value)}
-                      onKeyDown={handleKey}
-                    />
+                    <div className="search-input-container" ref={suggestionRef}>
+                      <input
+                        id="skill-input"
+                        type="text"
+                        className="cyber-input"
+                        placeholder="enter skills: python, react, rust, go..."
+                        value={skills}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKey}
+                        autoComplete="off"
+                      />
+                      {showSuggestions && (
+                        <div className="suggestions-dropdown">
+                          {filteredSuggestions.map((s, i) => (
+                            <div
+                              key={i}
+                              className={`suggestion-item ${i === suggestionIndex ? 'active' : ''}`}
+                              onClick={() => selectSuggestion(s)}
+                            >
+                              <span>{s}</span>
+                              <span className="suggestion-tag">skill</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <button
                       id="scan-btn"
                       className="cyber-submit"
-                      onClick={findIssues}
+                      onClick={() => findIssues()}
                       disabled={loading || !skills.trim()}
                     >
                       {loading ? 'scanning...' : '> scan'}
