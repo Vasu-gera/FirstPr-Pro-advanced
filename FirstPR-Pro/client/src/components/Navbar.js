@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 const Navbar = ({ onLaunch, isDashboard }) => {
   const [scrolled, setScrolled] = useState(false);
+  const { user, login, logout } = useAuth() || {};
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -38,9 +40,33 @@ const Navbar = ({ onLaunch, isDashboard }) => {
               </>
             ) : (
               <>
-                <li>
+                <li><Link to="/dashboard" style={{textDecoration: 'none', color: 'var(--text)'}}>Scanner</Link></li>
+                <li><Link to="/marketplace" style={{textDecoration: 'none', color: 'var(--text)'}}>Marketplace</Link></li>
+                <li><Link to="/leaderboard" style={{textDecoration: 'none', color: 'var(--text)'}}>Leaderboard</Link></li>
+                
+                {user ? (
+                  <li style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                    <span style={{color: 'var(--accent-green)', fontFamily: 'var(--font-mono)', fontSize: '0.9rem'}}>[{user}]</span>
+                    <button onClick={logout} style={{background: 'none', border: '1px solid var(--muted)', color: 'var(--muted)', cursor: 'pointer', padding: '0.2rem 0.5rem', borderRadius: '4px'}}>Exit</button>
+                  </li>
+                ) : (
+                  <li>
+                    <button 
+                      onClick={() => {
+                        const name = window.prompt("Enter your hacker alias:");
+                        if(name) login(name);
+                      }}
+                      className="nav-cta"
+                      style={{ background: 'none', border: '1px solid var(--accent-cyan)', color: 'var(--accent-cyan)', font: 'inherit', cursor: 'pointer', padding: '4px 12px' }}
+                    >
+                      Login
+                    </button>
+                  </li>
+                )}
+                
+                <li style={{marginLeft: '1rem'}}>
                   <Link to="/" className="nav-cta" style={{ textDecoration: 'none' }}>
-                    &lt; Back to Home
+                    &lt; Home
                   </Link>
                 </li>
               </>

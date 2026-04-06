@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import issues
+from routes import issues, marketplace, leaderboard
+from database import engine
+import models
+
+# Create database tables
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="FirstPR Pro API")
 
@@ -14,6 +19,8 @@ app.add_middleware(
 )
 
 app.include_router(issues.router)
+app.include_router(marketplace.router)
+app.include_router(leaderboard.router)
 
 @app.get("/")
 def read_root():
