@@ -1,6 +1,6 @@
 from datetime import datetime
 
-def rank_issues(issues, skills):
+def rank_issues(issues, skills, level="beginner"):
     user_skills = set(skills.replace(',', ' ').lower().split())
     ranked_issues = []
     
@@ -24,18 +24,23 @@ def rank_issues(issues, skills):
             elif skill in body:
                 score += body_match_weight
                 
-        # Label / Title 'good first issue'
-        is_good_first = "good first issue" in title
-        if not is_good_first:
-            for label in labels:
-                if isinstance(label, dict) and "good first issue" in str(label.get("name", "")).lower():
-                    is_good_first = True
-                    break
-                elif isinstance(label, str) and "good first issue" in label.lower():
-                    is_good_first = True
-                    break
+        # Label check based on level
+        target_label = "good first issue" if level == "beginner" else "help wanted" if level == "intermediate" else None
+        
+        has_target_label = False
+        if target_label:
+            if target_label in title:
+                has_target_label = True
+            if not has_target_label:
+                for label in labels:
+                    if isinstance(label, dict) and target_label in str(label.get("name", "")).lower():
+                        has_target_label = True
+                        break
+                    elif isinstance(label, str) and target_label in label.lower():
+                        has_target_label = True
+                        break
                 
-        if is_good_first:
+        if has_target_label or level == "pro":
             score += 10
             
         # Recency

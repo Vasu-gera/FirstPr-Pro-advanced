@@ -40,7 +40,7 @@ def is_english(text: str) -> bool:
     return not contains_cjk(text)
 
 
-def fetch_github_issues(skills: str):
+def fetch_github_issues(skills: str, level: str = "beginner"):
     """
     Fetches English-only 'good first issue' results from GitHub Search API.
 
@@ -58,10 +58,16 @@ def fetch_github_issues(skills: str):
     # Layer 1 — query-level hint: GitHub doesn't have a strict `language:english`
     # qualifier, but adding common English stop-words + `in:title` narrows results.
     # We fetch more than needed so the CJK post-filter still returns enough results.
+    level_query = 'label:"good first issue"'
+    if level == "intermediate":
+        level_query = 'label:"help wanted" -label:"good first issue"'
+    elif level == "pro":
+        level_query = '-label:"good first issue" -label:"help wanted"'
+
     query = (
-        f"{skills} \"good first issue\" \"help wanted\" "
+        f"{skills} {level_query} "
         f"is:issue is:open in:title,body"
-    )
+    ).strip()
 
     params = {
         "q": query,

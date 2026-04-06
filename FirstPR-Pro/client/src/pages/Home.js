@@ -104,6 +104,7 @@ const isEnglishIssue = (issue) =>
 
 const Home = () => {
   const [skills, setSkills]   = useState('');
+  const [level, setLevel]     = useState('beginner');
   const [issues, setIssues]   = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
@@ -125,15 +126,16 @@ const Home = () => {
     setTimeout(() => appRef.current?.querySelector('input')?.focus(), 500);
   };
 
-  const findIssues = async (overrideSkills) => {
+  const findIssues = async (overrideSkills, overrideLevel) => {
     const query = overrideSkills || skills;
+    const currentLevel = overrideLevel || level;
     if (!query.trim()) return;
     setLoading(true);
     setError(null);
     setSearched(true);
     setShowSuggestions(false);
     try {
-      const res = await fetch(`http://localhost:8000/issues?skills=${encodeURIComponent(query)}`);
+      const res = await fetch(`http://localhost:8000/issues?skills=${encodeURIComponent(query)}&level=${currentLevel}`);
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       const englishOnly = Array.isArray(data) ? data.filter(isEnglishIssue) : [];
@@ -464,6 +466,36 @@ const Home = () => {
                     >
                       {loading ? 'scanning...' : '> scan'}
                     </button>
+                  </div>
+
+                  <div className="level-selector" style={{display: 'flex', gap: '1rem', marginTop: '1.5rem', marginBottom: '1rem', justifyContent: 'center'}}>
+                    {['beginner', 'intermediate', 'pro'].map(lv => (
+                      <button 
+                        key={lv} 
+                        className={`level-pill ${level === lv ? 'active' : ''}`}
+                        onClick={() => {
+                          setLevel(lv);
+                          if (skills.trim()) {
+                            findIssues(null, lv);
+                          }
+                        }}
+                        style={{
+                          background: level === lv ? 'rgba(0, 255, 170, 0.1)' : 'transparent',
+                          border: `1px solid ${level === lv ? 'var(--accent-green)' : 'var(--muted)'}`,
+                          color: level === lv ? 'var(--accent-green)' : 'var(--muted)',
+                          padding: '0.4rem 1rem',
+                          borderRadius: '20px',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '1px',
+                          transition: 'all 0.2s ease',
+                          fontFamily: 'var(--font-mono)'
+                        }}
+                      >
+                        {lv}
+                      </button>
+                    ))}
                   </div>
 
                   {error && (
