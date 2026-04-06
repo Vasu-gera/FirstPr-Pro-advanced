@@ -1,14 +1,61 @@
-import React from 'react';
+import React from "react";
 
-const IssueCard = ({ issue }) => {
-  return (
-    <div style={{ border: '1px solid #ccc', padding: '15px', margin: '10px 0', borderRadius: '8px' }}>
-      <h3>{issue.title}</h3>
-      <p><strong>Repo:</strong> {issue.repo}</p>
-      <p><strong>Score:</strong> {issue.score}</p>
-      <a href={issue.url} target="_blank" rel="noopener noreferrer">View on GitHub</a>
-    </div>
-  );
+const labelStyles = {
+  "good first issue": "label-green",
+  "help wanted": "label-blue",
 };
 
-export default IssueCard;
+function getScoreColor(score) {
+  if (score >= 80) return "#34d399";
+  if (score >= 50) return "#fbbf24";
+  return "#f87171";
+}
+
+export default function IssueCard({ issue }) {
+  const { title, repo, score, labels = [], url, html_url, repository } = issue;
+  
+  const displayRepo = repo || repository;
+  const displayScore = score || 0;
+  const scoreColor = getScoreColor(displayScore);
+  const externalLink = url || html_url;
+
+  return (
+    <div className="issue-card">
+      <div className="card-head">
+        <div className="card-meta">
+          <p className="card-repo">{displayRepo}</p>
+          <h3 className="card-title">{title}</h3>
+        </div>
+        <div className="score-badge">
+          <div className="score-num" style={{ color: scoreColor, borderColor: `${scoreColor}40`, background: `${scoreColor}10` }}>
+            {displayScore}
+          </div>
+          <span className="score-label">score</span>
+        </div>
+      </div>
+
+      <div className="score-bar-track">
+        <div
+          className="score-bar-fill"
+          style={{ width: `${displayScore}%`, background: scoreColor }}
+        />
+      </div>
+
+      <div className="card-labels">
+        {labels.map((label) => (
+          <span
+            key={label}
+            className={`label-tag ${labelStyles[label.toLowerCase()] || "label-gray"}`}
+          >
+            <span className="label-dot" />
+            {label}
+          </span>
+        ))}
+      </div>
+
+      <a href={externalLink} target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
+        <button className="view-btn">View Issue →</button>
+      </a>
+    </div>
+  );
+}
