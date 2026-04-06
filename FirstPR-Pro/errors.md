@@ -41,3 +41,21 @@ Search results include issues written in non-English languages such as Chinese a
 - Add language filter in API query (e.g., language:javascript, language:python)
 - Allow user to select preferred language
 - Filter non-English text using validation logic
+## 🔴 Problem 3: No Skill Suggestion While Typing
+
+### Issue:
+The system does not provide any suggestions while the user types skills. Users must manually guess the correct keywords.
+
+### Impact:
+- Poor user experience
+- Incorrect or inconsistent skill input
+- Reduced matching accuracy and relevance of results
+
+### Cause:
+- No autocomplete or suggestion mechanism implemented
+- No predefined skill dataset used for guidance
+
+### Suggested Fix:
+- Implement dynamic skill suggestion (autocomplete) feature
+- Provide a predefined list of common technical skills
+- Allow multi-skill selection with guided input
