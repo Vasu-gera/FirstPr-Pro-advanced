@@ -2,93 +2,121 @@
 
 > **Find your first open-source contribution in seconds — not hours.**
 
-**FirstPR Pro** is an AI-powered GitHub issue recommendation engine that helps developers discover beginner-friendly issues tailored to their skills, making it easier to start contributing to open source with confidence.
+**FirstPR Pro** is an AI-powered GitHub issue recommendation engine that helps developers discover beginner-friendly issues tailored to their skills.
+
+It uses a **Python backend + AI (Gemini API)** to intelligently filter and rank issues so beginners can confidently make their first pull request.
 
 ---
 
 ## 🌟 Why FirstPR Pro?
 
-One of the biggest challenges for new developers is:
-
 > “I want to contribute to open source… but I don’t know where to start.”
 
-Even though GitHub provides tags like `good-first-issue`, beginners still face:
-- Irrelevant or outdated issues  
+GitHub has thousands of issues, but:
 - Poor filtering by skill level  
-- Overwhelming search results  
+- Misleading `good-first-issue` tags  
+- Overwhelming results  
 
-💡 **FirstPR Pro solves this by using AI as a smart recommendation layer on top of GitHub.**
+💡 **FirstPR Pro solves this using AI + ranking to show only the best issues for YOU.**
 
 ---
 
 ## 🧠 How It Works
 
-1. You enter your **skills & technologies**
-2. The system fetches issues from GitHub
-3. A custom **Python ranking engine** scores them
-4. **Google Gemini AI** filters and refines the best matches
-5. You get a **highly curated list of issues you can actually solve**
+1. User enters **skills & technologies**
+2. Backend fetches issues using GitHub API
+3. Python engine ranks issues
+4. **Gemini AI filters the best matches**
+5. Returns a **clean, curated list**
 
 ---
 
 ## ✨ Core Features
 
 ### 🤖 AI-Powered Filtering (Gemini API)
-- Deep contextual understanding of issue requirements vs your skills  
-- Filters out misleading `good-first-issue` tags  
-- Ensures high-quality recommendations  
+- Understands issue context deeply  
+- Removes complex or irrelevant issues  
+- Suggests best issues for your **first PR**  
 
 ### 🔹 Personalized Recommendations
-- Matches issues with your **skills and tech stack**  
-- Filters by `good-first-issue` and `help-wanted`  
-- Reduces noise → only relevant issues  
+- Skill-based matching  
+- Beginner-friendly filtering  
+- Clean results  
 
-### 🔹 Intelligent Ranking Engine
-- Skill matching score  
+### 🔹 Ranking Engine
+- Skill match score  
 - Issue recency  
-- Repository activity level  
-- Relevance-based sorting  
+- Repo activity  
 
-### 🔹 Real-Time Data Fetching
-- GitHub REST API integration  
-- Puppeteer fallback scraping  
+### 🔹 Real-Time Data
+- GitHub REST API  
+- Smart filtering pipeline  
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- HTML5, CSS3, JavaScript (ES6)
+### Frontend (client/)
+- React.js  
+- JavaScript (ES6)  
+- CSS  
 
-### Backend
-- Node.js, Express.js
+### Backend (server/)
+- Python  
+- REST APIs  
 
-### Ranking & AI Logic
-- Python (custom scoring algorithm)  
-- Google Gemini API (AI contextual filtering)
+### AI Layer
+- Google Gemini API  
+
+### Database
+- SQLite (`firstpr.db`)  
 
 ### Integrations
 - GitHub REST API  
-- Puppeteer  
+
+---
+
+## 🏗️ Project Structure
+
+```
+FIRSTPR-PRO/
+├── client/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│
+├── server/
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   ├── main.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── database.py
+│   ├── requirements.txt
+│   ├── firstpr.db
+│   └── .env
+│
+├── README.md
+└── .gitignore
+```
 
 ---
 
 ## 🏗️ System Architecture
 
-```text
-User Input (Skills)
+```
+Frontend (React)
         ↓
-Frontend (HTML/CSS/JS)
+Python Backend (API)
         ↓
-Node.js Backend (Express)
+GitHub API
         ↓
-GitHub API + Scraper
+Ranking Engine (Python)
         ↓
-Python Ranking Engine
+Gemini AI Filtering
         ↓
-Gemini AI API (Contextual Filtering)
-        ↓
-Ranked & Verified Issues Response
+Final Recommendations
         ↓
 Frontend Display
 ```
@@ -100,58 +128,58 @@ Frontend Display
 ### Prerequisites
 - Node.js v18+
 - Python 3.9+
-- GitHub Personal Access Token
+- GitHub Token
 - Gemini API Key
 
 ---
 
-### 1. Clone the Repository
+### 1. Clone Repo
 ```bash
 git clone https://github.com/Vasu-gera/FirstPr-Pro-advanced.git
 cd FirstPr-Pro-advanced
 ```
 
-### 2. Install Dependencies
+---
+
+### 2. Setup Backend
+
 ```bash
-npm install
+cd server
 pip install -r requirements.txt
 ```
 
----
-
-### 3. Environment Variables
-
-Create a `.env` file:
+Create `.env`:
 
 ```env
-GITHUB_TOKEN=your_github_token
-GEMINI_API_KEY=your_gemini_api_key
-PORT=3000
+GITHUB_TOKEN=your_token
+GEMINI_API_KEY=your_key
+```
+
+Run backend:
+
+```bash
+python main.py
 ```
 
 ---
 
-### 4. Run Backend
-```bash
-node server.js
-```
+### 3. Setup Frontend
 
----
-
-### 5. Run Frontend
 ```bash
-npx serve frontend
+cd client
+npm install
+npm start
 ```
 
 ---
 
 ## 🚀 Usage
 
-1. Open the application  
-2. Enter your skills (e.g., `JavaScript`, `Python`)  
+1. Open the app  
+2. Enter skills  
 3. Click **Find Issues**  
-4. Browse AI-ranked GitHub issues  
-5. Start contributing 🎉  
+4. Get AI-filtered results  
+5. Start contributing 🚀  
 
 ---
 
@@ -159,92 +187,54 @@ npx serve frontend
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/issues` | Fetch raw issues |
-| POST | `/prefs` | Store user preferences |
-| GET | `/recommend` | Get AI-ranked issues |
+| GET | `/issues` | Fetch issues |
+| POST | `/prefs` | Store preferences |
+| GET | `/recommend` | AI-ranked issues |
 
 ---
 
-## 📁 Project Structure
+## ⚠️ Edge Cases
 
-```
-FirstPr-Pro-advanced/
-├── frontend/
-├── backend/
-├── ranking/
-├── package.json
-├── requirements.txt
-└── README.md
-```
-
----
-
-## ⚠️ Edge Case Handling
-
-- Empty input → Validation warnings  
-- No results → Helpful fallback messaging  
-- API rate limits → Puppeteer fallback  
-- AI/Ranking failure → Default sorting  
+- Empty input → validation  
+- No results → fallback suggestion  
+- API limit → handled gracefully  
+- AI failure → fallback ranking  
 
 ---
 
 ## 🧩 Challenges
 
-- Handling GitHub API rate limits  
-- Fine-tuning Gemini API prompts  
-- Node.js ↔ Python integration  
-- Maintaining real-time performance  
+- GitHub API rate limits  
+- Gemini prompt tuning  
+- Python backend design  
+- AI + ranking integration  
 
 ---
 
 ## 🔮 Future Improvements
 
-- [ ] 🔐 GitHub OAuth login  
-- [ ] 🤖 AI-generated “How to start” summaries  
-- [ ] 📬 Weekly personalized issue digest  
-- [ ] 🌐 Browser extension  
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-```bash
-git checkout -b feature/your-feature
-git commit -m "Add feature"
-git push origin feature/your-feature
-```
-
-Then open a Pull Request 🚀
-
----
-
-## 📄 License
-
-MIT License
+- [ ] GitHub OAuth  
+- [ ] AI “how to solve this issue” suggestions  
+- [ ] Difficulty scoring  
+- [ ] Chrome extension  
 
 ---
 
 ## 👨‍💻 Author
 
 **Vasu Gera**  
-Backend Developer & System Designer  
-Focused on building developer tools & scalable systems  
 
 ---
 
 ## 💡 Vision
 
-> FirstPR Pro is not just a tool — it's a bridge.
+> Turning confusion into contribution.
 
-A bridge between:
-- Learning → Contributing  
-- Beginners → Open Source  
-- Confusion → Action  
+Helping developers go from:
+**“Where do I start?” → “I made my first PR 🚀”**
 
 ---
 
 <div align="center">
-  <b>Helping developers make their first PR 🚀</b>
+  <b>Built to simplify open source onboarding 🚀</b>
 </div>
